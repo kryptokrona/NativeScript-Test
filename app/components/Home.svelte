@@ -1,27 +1,51 @@
-<page>
-    <actionBar title="Home" />
-    <gridLayout>
-        <label class="info">
-            <formattedString>
-                <span class="fas" text="&#xf135;" />
-                <span text=" {message}" />
-            </formattedString>
-        </label>
-    </gridLayout>
-</page>
-
 <script lang="ts">
-    let message: string = "Blank Svelte Native App"
+    import {Http, HttpResponse} from '@nativescript/core'
+
+
+    let data
+    const getHuginData = async () => {
+        Http.request({
+            url: 'https://api.hugin.chat/api/v1/posts?size=50',
+            method: 'GET'
+        }).then(
+            (response: HttpResponse) => {
+                data = JSON.parse(response.content)
+            },
+            e => {
+                console.log('erroe ', e)
+            }
+        )
+    }
+
+    getHuginData()
+
 </script>
 
+<page>
+    <actionBar title="Home"/>
+    <scrollView orientation="vertical">
+        <stackLayout>
+
+            {#if data}
+                {#each data.posts ?? [] as item}
+                    <label class="label" textWrap="true" text={item.message}/>
+                {/each}
+            {:else }
+                <label class="label" textWrap="true" text='NO MESSAGES'/>
+            {/if}
+
+        </stackLayout>
+    </scrollView>
+</page>
+
 <style>
-    .info .fas {
-        color: #3A53FF;
+
+    .label {
+        margin: 10px 0;
+        background-color: #171717;
+        border-radius: 8px;
+        border: 1px solid #252525;
+        padding: 20px;
     }
 
-    .info {
-        font-size: 20;
-        horizontal-align: center;
-        vertical-align: center;
-    }
 </style>
